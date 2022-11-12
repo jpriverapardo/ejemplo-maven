@@ -12,5 +12,10 @@ pipeline {
                 cleanWs()
             }
         }
+        stage('Hello') {
+            steps {
+                echo 'Bye Bye'
+            }
+        }
     }
 }
