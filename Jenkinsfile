@@ -1,44 +1,47 @@
+import groovy.json.JsonSlurperClassic
+def jsonParse(def json) {
+    new groovy.json.JsonSlurperClassic().parseText(json)
+}
 pipeline {
     agent any
-
     stages {
-        stage('Compile Code') {
+        stage("Paso 1: Compliar"){
             steps {
-                ./mvnw.cmd clean compile -e
+                script {
+                sh "echo 'Compile Code!'"
+                // Run Maven on a Unix agent.
+                sh "./mvnw clean compile -e"
+                }
             }
         }
-        stage('Test Code') {
+        stage("Paso 2: Testear"){
             steps {
-                ./mvnw.cmd clean test -e
+                script {
+                sh "echo 'Test Code!'"
+                // Run Maven on a Unix agent.
+                sh "./mvnw clean test -e"
+                }
             }
         }
-        stage('Jar Code') {
+        stage("Paso 3: Build .Jar"){
             steps {
-                ./mvnw.cmd clean package -e
-            }
-        }
-        stage('Run Jar') {
-            steps {
-                ./mvnw.cmd spring-boot:run
-                // nohup bash mvnw.cmd spring-boot:run &
-            }
-        }
-        stage('Testing Application') {
-            steps {
-                // ./mvnw.cmd spring-boot:run
-                curl -X GET 'http://localhost:8081/rest/mscovid/test?msg=testing'
+                script {
+                sh "echo 'Build .Jar!'"
+                // Run Maven on a Unix agent.
+                sh "./mvnw clean package -e"
+                }
             }
         }
     }
+    post {
+        always {
+            sh "echo 'fase always executed post'"
+        }
+        success {
+            sh "echo 'fase success'"
+        }
+        failure {
+            sh "echo 'fase failure'"
+        }
+    }
 }
-
-
-Test Code
-./mvnw.cmd clean test -e
-Jar Code
-./mvnw.cmd clean package -e
-Run Jar
-Local: ./mvnw.cmd spring-boot:run
-Background: nohup bash mvnw.cmd spring-boot:run &
-Testing Application
-Abrir navegador: http://localhost:8081/rest/mscovid/test?msg=testing
