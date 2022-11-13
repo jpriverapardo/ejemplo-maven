@@ -23,7 +23,7 @@ pipeline {
                 }
             }
         }
-        stage("Paso 3: Build .Jar"){
+        stage("Paso 3: Build .Jar step"){
             steps {
                 script {
                 sh "echo 'Build .Jar!'"
