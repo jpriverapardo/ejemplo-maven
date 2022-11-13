@@ -2,25 +2,43 @@ pipeline {
     agent any
 
     stages {
-        stage('Starting Pipeline') {
+        stage('Compile Code') {
             steps {
-                echo 'Starting Pipeline'
+                ./mvnw.cmd clean compile -e
             }
         }
-        stage('Building declarative Pipeline') {
+        stage('Test Code') {
             steps {
-                echo 'Building declarative Pipeline'
+                ./mvnw.cmd clean test -e
             }
         }
-        stage('Testing Declarative Pipeline') {
+        stage('Jar Code') {
             steps {
-                echo 'Testing declarative Pipeline'
+                ./mvnw.cmd clean package -e
             }
         }
-        stage('Finish declarative Pipeline') {
+        stage('Run Jar') {
             steps {
-                echo 'Finish declarative Pipeline'
+                ./mvnw.cmd spring-boot:run
+                // nohup bash mvnw.cmd spring-boot:run &
+            }
+        }
+        stage('Testing Application') {
+            steps {
+                // ./mvnw.cmd spring-boot:run
+                curl -X GET 'http://localhost:8081/rest/mscovid/test?msg=testing'
             }
         }
     }
 }
+
+
+Test Code
+./mvnw.cmd clean test -e
+Jar Code
+./mvnw.cmd clean package -e
+Run Jar
+Local: ./mvnw.cmd spring-boot:run
+Background: nohup bash mvnw.cmd spring-boot:run &
+Testing Application
+Abrir navegador: http://localhost:8081/rest/mscovid/test?msg=testing
