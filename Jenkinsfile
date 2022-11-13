@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+        stage('Starting Pipeline') {
             steps {
-                echo 'Hello World'
+                echo 'Starting Pipeline'
             }
         }
-        stage('Build') {
+        stage('Building declarative Pipeline') {
             steps {
                 echo 'Building declarative Pipeline'
             }
@@ -17,7 +17,7 @@ pipeline {
                 echo 'Testing declarative Pipeline'
             }
         }
-        stage('Finish') {
+        stage('Finish declarative Pipeline') {
             steps {
                 echo 'Finish declarative Pipeline'
             }
