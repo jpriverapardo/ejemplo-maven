@@ -9,7 +9,7 @@ pipeline {
         stage("Saludar"){
             steps {
                 script {
-                sh "echo 'Hello, World Usach!'"
+                sh "echo 'Hello hello, World Usach!'"
                 }
             }
         }
