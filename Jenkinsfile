@@ -1,23 +1,44 @@
 import groovy.json.JsonSlurperClassic
-
 def jsonParse(def json) {
     new groovy.json.JsonSlurperClassic().parseText(json)
 }
 pipeline {
     agent any
     stages {
-        stage("Saludar"){
+        stage("Paso 1: Compilar"){
             steps {
                 script {
-                sh "echo 'Hello hello, World Usach!'"
+                sh "echo 'Compile Code!'"
+                // Run Maven on a Unix agent.
+                sh "./mvnw clean compile -e"
                 }
             }
         }
-        stage("Sonar: Análisis SonarQube"){
+        stage("Paso 2: Testear"){
             steps {
-                sh "echo 'Calling sonar Service in another docker container!'"
-                // Run Maven on a Unix agent to execute Sonar.
-                sh './mvnw clean verify sonar:sonar'
+                script {
+                sh "echo 'Test Code!'"
+                // Run Maven on a Unix agent.
+                sh "./mvnw clean test -e"
+                }
+            }
+        }
+        stage("Paso 3: Build .Jar step"){
+            steps {
+                script {
+                sh "echo 'Build .Jar!'"
+                // Run Maven on a Unix agent.
+                sh "./mvnw clean package -e"
+                }
+            }
+        }
+        stage("Paso 4: Análisis SonarQube"){
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh "echo 'Calling sonar Service in another docker container!'"
+                    // Run Maven on a Unix agent to execute Sonar.
+                    sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=custom-project-key -Dsonar.projectName=custom-project-key'
+                }
             }
         }
     }
