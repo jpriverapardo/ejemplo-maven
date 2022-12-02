@@ -44,11 +44,19 @@ pipeline {
                 }
             }
         }
-        stage("Paso 5: Test de Newman"){
+        stage("Paso 5: Levanto Springboot"){
             steps {
                 script{
                     // sh "sleep 20 && newman run /home/ejemplo-maven.postman_collection.json"
-                    sh "newman run ejemplo-maven.postman_collection.json"
+                    sh "mvn spring-boot:run"
+                }
+            }
+        }
+        stage("Paso 6: Test de Newman"){
+            steps {
+                script{
+                    // sh "sleep 20 && newman run /home/ejemplo-maven.postman_collection.json"
+                    sh "sleep 20 && newman run ejemplo-maven.postman_collection.json"
                 }
             }
         }
