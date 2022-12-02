@@ -17,9 +17,9 @@ pipeline {
         stage("Paso 2: Testear"){
             steps {
                 script {
-                sh "echo 'Test Code!'"
-                // Run Maven on a Unix agent.
-                sh "./mvnw clean test -e"
+                    sh "echo 'Test Code!'"
+                    // Run Maven on a Unix agent.
+                    sh "./mvnw clean test -e"
                 }
             }
         }
@@ -38,6 +38,13 @@ pipeline {
                     sh "echo 'Calling sonar Service in another docker container!'"
                     // Run Maven on a Unix agent to execute Sonar.
                     sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=custom-project-key -Dsonar.projectName=custom-project-key'
+                }
+            }
+        }
+        stage("Paso 5: Test de Newman"){
+            steps {
+                script{
+                    newman run ejemplo-maven.postman_collection.json  -n 10 --delay-request 500
                 }
             }
         }
