@@ -5,61 +5,56 @@ def jsonParse(def json) {
 pipeline {
     agent any
     stages {
-        stage("Paso 1: Compilar"){
-            steps {
-                script {
-                sh "echo 'Compile Code!'"
-                // Run Maven on a Unix agent.
-                sh "./mvnw clean compile -e"
-                }
-            }
-        }
-        stage("Paso 2: Testear"){
-            steps {
-                script {
-                    sh "echo 'Test Code!'"
-                    // Run Maven on a Unix agent.
-                    sh "./mvnw clean test -e"
-                }
-            }
-        }
-        stage("Paso 3: Build .Jar step"){
-            steps {
-                script {
-                sh "echo 'Build .Jar!'"
-                // Run Maven on a Unix agent.
-                sh "./mvnw clean package -e"
-                }
-            }
-        }
-        stage("Paso 4: Análisis SonarQube"){
-            steps {
-                // withSonarQubeEnv('sonarqube') {
-                //     sh "echo 'Calling sonar Service in another docker container!'"
-                //     // Run Maven on a Unix agent to execute Sonar.
-                //     sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=custom-project-key -Dsonar.projectName=custom-project-key'
-                // }
-                script {
-                    sh "echo 'Ejecute Sonar, si claro!'"
-                }
-            }
-        }
-        stage("Paso 5: Levanto Springboot"){
+         stage("Paso 1: Build && Test"){
             steps {
                 script{
-                    // sh "sleep 20 && newman run /home/ejemplo-maven.postman_collection.json"
-                    sh "mvn spring-boot:run"
+                    sh "echo 'Build && Test!'"
+                    sh "./mvnw clean package -e"    
                 }
             }
         }
-        stage("Paso 6: Test de Newman"){
+
+        stage("Paso 2: Sonar - Análisis Estático"){
             steps {
                 script{
-                    // sh "sleep 20 && newman run /home/ejemplo-maven.postman_collection.json"
-                    sh "sleep 20 && newman run ejemplo-maven.postman_collection.json"
+                    sh "echo 'Análisis Estático!'"
+                        withSonarQubeEnv('sonarqube') {
+                            sh "echo 'Calling sonar by ID!'"
+                            // Run Maven on a Unix agent to execute Sonar.
+                            sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=ejemplo-maven-full-stages -Dsonar.projectName=cejemplo-maven-full-stages -Dsonar.java.binaries=build'
+                        }
+                        
                 }
             }
         }
+        
+        stage("Paso 3: Curl Springboot maven sleep 20"){
+            steps {
+                script{
+                    sh "nohup bash ./mvnw spring-boot:run  & >/dev/null"
+                    sh "sleep 20 && curl -X GET 'http://localhost:8081/rest/mscovid/test?msg=testing'"
+                }
+            }
+        }
+        stage("Paso 4: Test de Newman"){
+            steps {
+                script{
+                    sh "newman run ejemplo-maven.postman_collection.json"
+                }
+            }
+        }
+        stage("Paso 5: Detener Spring Boot"){
+            steps {
+                script{
+                    sh '''
+                        echo 'Process Spring Boot Java: ' $(pidof java | awk '{print $1}')  
+                        sleep 20
+                        kill -9 $(pidof java | awk '{print $1}')
+                    '''
+                }
+            }
+        }
+        
     }
     post {
         always {
