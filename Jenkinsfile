@@ -48,7 +48,7 @@ pipeline {
             steps {
                 script{
                     // sh "sleep 20 && newman run /home/ejemplo-maven.postman_collection.json"
-                    newman run ejemplo-maven.postman_collection.json
+                    sh "newman run ejemplo-maven.postman_collection.json"
                 }
             }
         }
